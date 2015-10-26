@@ -1,29 +1,32 @@
 #include <ruby.h>
 #include <stdio.h>
-#include "ffts/ffts.h"
+#include <ffts/ffts.h>
+
+// Declare variables.
+VALUE cFFTS;
 
 static VALUE
-ffts_init(VALUE self, VALUE size, VALUE sign) {
-  size_t requested = NUM2SIZET(size);
+_ffts_plan(VALUE klass, VALUE frames, VALUE sign) {
+  ffts_plan_t *plan;
+
   int sign_v = NUM2INT(sign);
-  ffts_plan_t *ffts_plan = ffts_init_1d(requested, sign_v);
-  ffts_free(ffts_plan);
-  printf("Allocated and released ffts plan.");
-  return self;
+  size_t size = RARRAY_LEN(frames);
+  plan = ffts_init_1d(size, sign_v);
+
+  return Data_Wrap_Struct(cFFTS, NULL, ffts_free, plan);
 }
 
 static VALUE
-ffts_release(VALUE self) {
+_ffts_exec(VALUE klass) {
   printf("In ffts_release.\n");
-  return self;
+
+  return Qnil;
 }
 
 void
 Init_ffts(void) {
-  VALUE cFFTS;
-
   cFFTS = rb_const_get(rb_cObject, rb_intern("FFTS"));
 
-  rb_define_method(cFFTS, "initialize", ffts_init, 1);
-  rb_define_method(cFFTS, "release", ffts_release, 1);
+  rb_define_singleton_method(cFFTS, "plan", _ffts_plan, 2);
+  rb_define_singleton_method(cFFTS, "execute", _ffts_exec, 0);
 }
