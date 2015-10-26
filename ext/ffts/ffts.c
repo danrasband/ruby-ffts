@@ -1,5 +1,6 @@
-#include <ruby.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <ruby.h>
 #include <ffts/ffts.h>
 
 // Declare variables.
@@ -7,12 +8,14 @@ VALUE mFFTS;
 VALUE cPlan;
 VALUE cCPlan;
 
+bool is_power_of_two(size_t num);
+
 static VALUE
 ffts_plan_initialize(VALUE self, VALUE rb_frames, VALUE rb_sign) {
   ffts_plan_t *plan;
 
-  size_t size = RARRAY_LEN(rb_frames);
-  if (size % 2 != 0) {
+  size_t n = RARRAY_LEN(rb_frames);
+  if (!is_power_of_two(n)) {
     rb_raise(rb_eRuntimeError, "Frames must be a power of 2.");
     return Qnil;
   }
@@ -23,11 +26,11 @@ ffts_plan_initialize(VALUE self, VALUE rb_frames, VALUE rb_sign) {
     return Qnil;
   }
 
-  plan = ffts_init_1d(size, sign_v);
+  plan = ffts_init_1d(n, sign_v);
 
   VALUE rb_plan = Data_Wrap_Struct(cCPlan, NULL, ffts_free, plan);
 
-  rb_funcall(self, rb_intern("n="), 1, INT2NUM(size));
+  rb_funcall(self, rb_intern("n="), 1, INT2NUM(n));
   rb_funcall(self, rb_intern("frames="), 1, rb_frames);
   rb_funcall(self, rb_intern("sign="), 1, rb_sign);
   rb_funcall(self, rb_intern("plan="), 1, rb_plan);
@@ -46,8 +49,8 @@ ffts_plan_execute(VALUE self) {
   ffts_plan_t *plan;
   Data_Get_Struct(rb_plan, ffts_plan_t, plan);
 
-  int n = NUM2INT(rb_n);
-  if (n % 2 != 0) {
+  size_t n = NUM2INT(rb_n);
+  if (!is_power_of_two(n)) {
     return Qnil;
   }
 
@@ -70,6 +73,11 @@ ffts_plan_execute(VALUE self) {
   free(output);
 
   return rb_output;
+}
+
+bool
+is_power_of_two(size_t num) {
+  return num != 0 && (num & (num - 1)) == 0;
 }
 
 void
