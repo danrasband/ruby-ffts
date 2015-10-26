@@ -12,13 +12,14 @@ _ffts_plan(VALUE klass, VALUE frames, VALUE sign) {
   int sign_v = NUM2INT(sign);
   size_t size = RARRAY_LEN(frames);
   plan = ffts_init_1d(size, sign_v);
+  printf("Size: %d. Sign: %d.\n", size, sign_v);
 
   return Data_Wrap_Struct(cFFTS, NULL, ffts_free, plan);
 }
 
 static VALUE
 _ffts_exec(VALUE klass) {
-  printf("In ffts_release.\n");
+  printf("In ffts_exec.\n");
 
   return Qnil;
 }

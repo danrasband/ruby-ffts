@@ -28,4 +28,8 @@ unless find_header('ffts/ffts.h')
   abort "FFTS is missing. Please install FFTS."
 end
 
+unless have_func('ffts_free', 'ffts/ffts.h')
+  abort "FFTS doesn't have that function."
+end
+
 create_makefile 'ffts/ffts'
