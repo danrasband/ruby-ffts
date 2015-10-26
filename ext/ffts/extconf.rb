@@ -1,4 +1,5 @@
 require 'mkmf'
+require 'pry-byebug'
 
 header_dirs = [
   # First search /opt/local for macports
@@ -28,8 +29,8 @@ unless find_header('ffts/ffts.h')
   abort "FFTS is missing. Please install FFTS."
 end
 
-unless have_func('ffts_free', 'ffts/ffts.h')
-  abort "FFTS doesn't have that function."
+unless find_library('ffts', 'ffts_free', *lib_dirs)
+  abort "FFTS library cannot be found. Please install FFTS."
 end
 
 create_makefile 'ffts/ffts'

@@ -1,7 +1,8 @@
+require './lib/ffts/version'
+
 Gem::Specification.new do |s|
   s.name        = 'ffts'
-  s.version     = '0.0.0'
-  s.date        = '2015-10-25'
+  s.version     = FFTS::VERSION
   s.summary     = 'FFTS'
   s.description = 'A native extension for the FFTS library.'
   s.authors     = ['Dan Rasband']
@@ -18,4 +19,5 @@ Gem::Specification.new do |s|
   s.extensions = %w[ext/ffts/extconf.rb]
 
   s.add_development_dependency 'rake-compiler', '~> 0.9.0'
+  s.add_development_dependency 'pry-byebug', '~> 3.2'
 end
